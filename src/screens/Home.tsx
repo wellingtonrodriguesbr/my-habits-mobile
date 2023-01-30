@@ -1,11 +1,23 @@
 import { useNavigation } from "@react-navigation/native";
-import { ScrollView, Text, View } from "react-native";
+import { useState } from "react";
+import { Alert, ScrollView, Text, View } from "react-native";
 import { DAY_SIZE, HabitDay } from "../components/HabitDay";
 import { Header } from "../components/Header";
 import { generateDatesFromYearBeginning } from "../utils/generate-dates-from-year-beginning";
 
 export function Home() {
   const { navigate } = useNavigation();
+  const [loading, setLoading] = useState(true);
+
+  async function fetchData() {
+    try {
+    } catch (error) {
+      Alert.alert("Ops", "Não foi possível carregar o sumário de hábitos.");
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <View className="flex-1 bg-background px-8 pt-16">
