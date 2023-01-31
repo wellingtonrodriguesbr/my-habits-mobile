@@ -5,11 +5,13 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { BackButton } from "../components/BackButton";
 import { Checkbox } from "../components/Checkbox";
 import colors from "tailwindcss/colors";
+import { api } from "../lib/axios";
 
 const availableWeekDays = [
   "Domingo",
@@ -23,6 +25,7 @@ const availableWeekDays = [
 
 export function NewHabit() {
   const [weekDays, setWeekDays] = useState<number[]>([]);
+  const [text, setText] = useState("");
 
   function handleToggleWeekDay(weekDayIndex: number) {
     if (weekDays.includes(weekDayIndex)) {
@@ -31,6 +34,25 @@ export function NewHabit() {
       );
     } else {
       setWeekDays((state) => [...state, weekDayIndex]);
+    }
+  }
+
+  async function createNewHabit() {
+    try {
+      if (!text.trim()) {
+        Alert.alert("Novo hábito", "Digite o novo hábito");
+      }
+      if (weekDays.length === 0) {
+        Alert.alert("Novo hábito", "Escolha pelo menos 1 dia da semana");
+      }
+
+      await api.post("/habits", { title: text, weekDays });
+      setText("");
+      setWeekDays([]);
+      Alert.alert("Novo hábito", "Hábito criado com sucesso!");
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Ops", "Não foi possíverl criar o nono hábito");
     }
   }
 
@@ -50,6 +72,8 @@ export function NewHabit() {
           className="h-12 pl-4 rounded-lg mt-3 bg-zinc-900 text-white border-2 border-zinc-800 focus:border-green-600"
           placeholder="Ex: Dormir bem, beber 2L de água, etc..."
           placeholderTextColor={colors.zinc[500]}
+          value={text}
+          onChangeText={setText}
         />
         <Text className="mt-4 mb-3 text-white text-base font-semibold">
           Qual a recorrência?
@@ -63,7 +87,10 @@ export function NewHabit() {
           />
         ))}
 
-        <TouchableOpacity className="bg-green-600 flex-row justify-center items-center h-14 w-full rounded-md my-6">
+        <TouchableOpacity
+          className="bg-green-600 flex-row justify-center items-center h-14 w-full rounded-md my-6"
+          onPress={createNewHabit}
+        >
           <Feather name="check" size={20} color={colors.white} />
           <Text className="font-semibold text-base text-white ml-2">
             Confirmar
